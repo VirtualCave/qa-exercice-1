@@ -1,0 +1,239 @@
+openapi: 3.0.3
+info:
+  title: Rates Api
+  description: Handle the info about rates in platform
+  version: "1.0"
+tags:
+- name: rates
+  description: Available operations for rates domain.
+paths:
+  /v1/rates:
+    get:
+      tags:
+      - rates
+      summary: Get rates list
+      operationId: getRates
+      parameters:
+      - in: query
+        description: The product id
+        name: productId
+        schema:
+          type: integer
+          format: int64
+          example: 1234
+      - in: query
+        description: The brand id
+        name: brandId
+        schema:
+          type: integer
+          format: int64
+          example: 1234
+      - in: query
+        description: The selected date
+        name: date
+        schema:
+          type: string
+          format: date
+          example: "2022-02-02"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rate'
+    post:
+      tags:
+      - rates
+      summary: Add a new rate
+      operationId: addRate
+      requestBody:
+        description: Use the required fields to create a new rate.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateRequest'
+        required: true
+      responses:
+        201:
+          description: Created rate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+        422:
+          description: Invalid input
+          content: {}
+  /v1/rates/{rateId}:
+    get:
+      tags:
+      - rates
+      summary: Get currency detail
+      operationId: getRateByCode
+      parameters:
+      - in: path
+        description: The currency ISO code
+        name: rateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+        401:
+          description: Authentication is required to get the requested response
+        404:
+          description: Rate not found
+    delete:
+      tags:
+      - rates
+      summary: Delete rate by id
+      operationId: deleteById
+      parameters:
+      - in: path
+        name: rateId
+        description: rate Id
+        example: 123435
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: Successful operation
+          content: {}
+        404:
+          description: Rate not found
+          content: {}
+    put:
+      tags:
+      - rates
+      summary: Updates rate
+      operationId: updateRate
+      parameters:
+      - name: rateId
+        in: path
+        description: rate id
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 12345
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateRequest'
+        required: true
+      responses:
+        200:
+          description: Rate successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+        422:
+          description: Invalid input.
+          content: {}
+components:
+  schemas:
+    Rate:
+      type: object
+      properties:
+        id:
+          description: rate identifier
+          type: integer
+          format: int64
+          example: 1123
+        brandId:
+          description: brand identifier
+          type: integer
+          format: int64
+          example: 112343
+        productId:
+          description: product identifier
+          type: integer
+          format: int64
+          example: 11232314
+        startDate:
+          description: rate start date range
+          type: string
+          format: date
+          example: "2022-01-01"
+        endDate:
+          description: rate end date range
+          type: string
+          format: date
+          example: "2023-01-01"
+        amount:
+          $ref: '#/components/schemas/Amount'
+      required:
+      - id
+      - brandId
+      - productId
+      - startDate
+      - endDate
+      - amount
+    Amount:
+      type: object
+      properties:
+        value:
+          type: integer
+          description: monetary value without decimals
+          example: 1704
+        currency:
+          type: string
+          description: ISO 4217 currency CODE
+          default: EUR
+          example: EUR
+        exponent:
+          type: integer
+          description: decimal index (value / 10^exponent)
+          default: 0
+          example: 3
+    RateRequest:
+      type: object
+      properties:
+        brandId:
+          description: brand identifier
+          type: integer
+          format: int64
+          example: 112343
+        productId:
+          description: product identifier
+          type: integer
+          format: int64
+          example: 11232314
+        startDate:
+          description: rate start date range
+          type: string
+          format: date
+          example: "2022-01-01"
+        endDate:
+          description: rate end date range
+          type: string
+          format: date
+          example: "2023-01-01"
+        price:
+          type: integer
+          description: monetary value without decimals
+          example: 1704
+        currencyCode:
+          type: string
+          description: ISO 4217 currency CODE
+          default: EUR
+          example: EUR
+      required:
+      - id
+      - brandId
+      - productId
+      - startDate
+      - endDate
+      - amount
